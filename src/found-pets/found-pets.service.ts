@@ -29,18 +29,26 @@ export class FoundPetsService {
 
     await this.foundPetRepository.save(foundPet);
 
-    const lostPet = await this.lostPetsService.findOneActive();
+    const nearbyLostPets = await this.lostPetsService.findActiveWithinRadius(
+      dto.location.lat,
+      dto.location.lng,
+    );
 
-    if (!lostPet) return foundPet;
+    if (nearbyLostPets.length === 0) return foundPet;
 
-    const html = generateFoundPetEmailTemplate(dto, lostPet);
+    for (const lostPet of nearbyLostPets) {
+      const html = generateFoundPetEmailTemplate(dto, lostPet);
 
-    await this.emailService.sendEmail({
-      to: envs.RECEIVER_EMAIL,
-      subject: 'Mascota encontrada 🐒',
-      html,
-    });
+      await this.emailService.sendEmail({
+        to: envs.RECEIVER_EMAIL,
+        subject: `🐾 Posible coincidencia: ${lostPet.name} fue encontrado cerca`,
+        html,
+      });
+    }
 
-    return foundPet;
+    return {
+      ...foundPet,
+      nearbyMatches: nearbyLostPets.length,
+    };
   }
 }
