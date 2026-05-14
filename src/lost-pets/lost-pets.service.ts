@@ -12,6 +12,12 @@ export class LostPetsService {
     private readonly dataSource: DataSource,
   ) {}
 
+  async findAll(): Promise<LostPet[]> {
+    return await this.lostPetRepository.find({
+      where: { is_active: true },
+    });
+  }
+
   async create(dto: CreateLostPetDto) {
     const lostPet = this.lostPetRepository.create({
       ...dto,

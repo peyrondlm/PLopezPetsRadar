@@ -10,5 +10,14 @@ services:
     volumes:
       - petradar_data_db:/var/lib/postgresql/data
 
+  redis:
+    image: redis:7-alpine
+    container_name: PetRadar_Redis
+    ports:
+      - ${REDIS_PORT}:6379
+    volumes:
+      - petradar_data_redis:/data
+
 volumes:
   petradar_data_db:
+  petradar_data_redis:

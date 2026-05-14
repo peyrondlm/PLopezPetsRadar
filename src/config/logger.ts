@@ -6,6 +6,9 @@ appInsights
   .setup(envs.APPINSIGHTS_CONNECTION_STRING)
   .setSendLiveMetrics(true)
   .setAutoCollectConsole(false)
+  .setAutoCollectRequests(true)
+  .setAutoCollectExceptions(true)
+  .setAutoCollectDependencies(true)
   .start();
 
 const aiClient = appInsights.defaultClient;
@@ -38,3 +41,15 @@ export const logger = winston.createLogger({
     appInsightsTransport,
   ],
 });
+
+export const trackEvent = (name: string, properties?: Record<string, string>) => {
+  aiClient.trackEvent({ name, properties });
+};
+
+export const trackException = (error: Error, properties?: Record<string, string>) => {
+  aiClient.trackException({ exception: error, properties });
+};
+
+export const trackMetric = (name: string, value: number) => {
+  aiClient.trackMetric({ name, value });
+};
